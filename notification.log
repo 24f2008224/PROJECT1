@@ -1,0 +1,7 @@
+Error notifying evaluation service for round 1: HTTPSConnectionPool(host='httpbin.org', port=443): Read timed out. (read timeout=10)
+Error notifying evaluation service for round 1: HTTPSConnectionPool(host='httpbin.org', port=443): Read timed out. (read timeout=10)
+Successfully notified evaluation service for round 1. Status code: 200
+Error notifying evaluation service for round 2: HTTPSConnectionPool(host='httpbin.org', port=443): Read timed out. (read timeout=10)
+Error notifying evaluation service for round 2: HTTPSConnectionPool(host='httpbin.org', port=443): Read timed out. (read timeout=10)
+Successfully notified evaluation service for round 2. Status code: 200
+Successfully notified evaluation service for round 1. Status code: 200
