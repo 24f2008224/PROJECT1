@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Patient History: {{ patient.user.username }}</h2>
+    <p><strong>Contact Info:</strong> {{ patient.contact_info }}</p>
+    <hr>
+    <h3>Medical History</h3>
+    <div class="card mb-3">
+        <div class="card-body">
+            {{ patient.medical_history if patient.medical_history else 'No recorded history.' }}
+        </div>
+    </div>
+
+    <h3>Past Appointments & Treatments</h3>
+    {% if appointments %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Doctor</th>
+                <th>Diagnosis</th>
+                <th>Prescription</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt.date_time }}</td>
+                <td>{{ appt.doctor.user.username }}</td>
+                <td>{{ appt.treatment.diagnosis if appt.treatment else '-' }}</td>
+                <td>{{ appt.treatment.prescription if appt.treatment else '-' }}</td>
+                <td>{{ appt.treatment.description if appt.treatment else '-' }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No past appointments found.</p>
+    {% endif %}
+</div>
+{% endblock %}

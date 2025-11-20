@@ -15,6 +15,7 @@ def dashboard():
     appointment_count = Appointment.query.count()
     departments = Department.query.all()
     doctors = Doctor.query.all()
+    patients = Patient.query.all()
     appointments = Appointment.query.all()
 
     return render_template('admin/dashboard.html',
@@ -23,16 +24,28 @@ def dashboard():
                            appointment_count=appointment_count,
                            departments=departments,
                            doctors=doctors,
+                           patients=patients,
                            appointments=appointments)
 
-@admin_bp.route('/search_doctor', methods=['POST'])
+@admin_bp.route('/search', methods=['POST'])
 @login_required
 @admin_required
-def search_doctor():
-    query = request.form.get('query')
-    doctors = Doctor.query.join(User).filter(User.username.contains(query) | Doctor.specialization.contains(query)).all()
-    # Re-render dashboard with filtered doctors (simplified for now)
-    # In a real app, we might want a separate search results page or AJAX
+def search():
+    doctor_query = request.form.get('doctor_query')
+    patient_query = request.form.get('patient_query')
+
+    doctors = Doctor.query.all()
+    if doctor_query:
+        doctors = Doctor.query.join(User).filter(User.username.contains(doctor_query) | Doctor.specialization.contains(doctor_query)).all()
+
+    patients = Patient.query.all() # We need to pass patients to template now to search/list them
+    # But previously dashboard didn't list patients. Let's fetch them.
+    if patient_query:
+        patients = Patient.query.join(User).filter(User.username.contains(patient_query) | Patient.contact_info.contains(patient_query)).all()
+    elif not patient_query and not doctor_query:
+        # If just loading dashboard normally we might not want all patients if huge, but for now ok.
+        pass
+
     doctor_count = Doctor.query.count()
     patient_count = Patient.query.count()
     appointment_count = Appointment.query.count()
@@ -45,6 +58,7 @@ def search_doctor():
                            appointment_count=appointment_count,
                            departments=departments,
                            doctors=doctors,
+                           patients=patients,
                            appointments=appointments)
 
 @admin_bp.route('/add_doctor', methods=['POST'])
@@ -83,4 +97,32 @@ def update_doctor(doctor_id):
     doctor.specialization = specialization
     db.session.commit()
     flash('Doctor updated successfully', 'success')
+    return redirect(url_for('admin.dashboard'))
+
+@admin_bp.route('/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_user(user_id):
+    user = User.query.get_or_404(user_id)
+    if user.role == 'admin':
+        flash('Cannot delete admin', 'danger')
+        return redirect(url_for('admin.dashboard'))
+
+    # Cascading delete should be handled by DB or manually if no cascade set
+    # Here manual cleanup for safety
+    if user.role == 'doctor':
+        doctor = Doctor.query.filter_by(user_id=user.id).first()
+        if doctor:
+            # Appointments? For now let's say we keep them or delete them
+            # Ideally we should soft delete or blacklist.
+            # Requirement says "Blacklist/remove".
+            db.session.delete(doctor)
+    elif user.role == 'patient':
+        patient = Patient.query.filter_by(user_id=user.id).first()
+        if patient:
+            db.session.delete(patient)
+
+    db.session.delete(user)
+    db.session.commit()
+    flash('User removed successfully', 'success')
     return redirect(url_for('admin.dashboard'))

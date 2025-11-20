@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from hms_app import db
 from hms_app.doctor import doctor_bp
-from hms_app.models import Appointment, Treatment
+from hms_app.models import Appointment, Treatment, Patient
 from hms_app.decorators import doctor_required
 
 @doctor_bp.route('/dashboard')
@@ -12,6 +12,14 @@ def dashboard():
     doctor = current_user.doctor
     appointments = Appointment.query.filter_by(doctor_id=doctor.id).all()
     return render_template('doctor/dashboard.html', appointments=appointments, doctor=doctor)
+
+@doctor_bp.route('/patient_history/<int:patient_id>')
+@login_required
+@doctor_required
+def patient_history(patient_id):
+    patient = Patient.query.get_or_404(patient_id)
+    appointments = Appointment.query.filter_by(patient_id=patient.id).order_by(Appointment.date_time.desc()).all()
+    return render_template('doctor/patient_history.html', patient=patient, appointments=appointments)
 
 @doctor_bp.route('/update_availability', methods=['POST'])
 @login_required
