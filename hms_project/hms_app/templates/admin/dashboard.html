@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Admin Dashboard</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Total Doctors</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ doctor_count }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Total Patients</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ patient_count }}</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-header">Total Appointments</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ appointment_count }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <h3>Add Doctor</h3>
+            <form method="POST" action="{{ url_for('admin.add_doctor') }}">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Department</label>
+                    <select name="department_id" class="form-control" required>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}">{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                 <div class="mb-3">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" name="specialization" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Doctor</button>
+            </form>
+        </div>
+        <div class="col-md-6">
+             <h3>Doctors List</h3>
+             <form action="{{ url_for('admin.search_doctor') }}" method="POST" class="mb-3">
+                 <div class="input-group">
+                     <input type="text" name="query" class="form-control" placeholder="Search by name or specialization">
+                     <button class="btn btn-outline-secondary" type="submit">Search</button>
+                 </div>
+             </form>
+             <ul class="list-group">
+                {% for doctor in doctors %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        {{ doctor.user.username }} ({{ doctor.department.name }})
+                        <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#editDoctor{{ doctor.id }}">
+                            Edit
+                        </button>
+                    </div>
+                    <div class="collapse mt-2" id="editDoctor{{ doctor.id }}">
+                        <form action="{{ url_for('admin.update_doctor', doctor_id=doctor.id) }}" method="POST">
+                            <div class="input-group input-group-sm">
+                                <input type="text" name="specialization" class="form-control" value="{{ doctor.specialization }}" placeholder="Specialization">
+                                <button class="btn btn-primary" type="submit">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+             </ul>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-12">
+            <h3>All Appointments</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Patient</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.id }}</td>
+                        <td>{{ appt.doctor.user.username }}</td>
+                        <td>{{ appt.patient.user.username }}</td>
+                        <td>{{ appt.date_time }}</td>
+                        <td>{{ appt.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

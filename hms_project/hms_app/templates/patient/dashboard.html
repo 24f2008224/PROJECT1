@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Patient Dashboard</h2>
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <a href="{{ url_for('patient.book_appointment') }}" class="btn btn-primary mb-3">Book Appointment</a>
+
+            <h3>My Appointments</h3>
+             <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Diagnosis</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.id }}</td>
+                        <td>{{ appt.doctor.user.username }} ({{ appt.doctor.department.name }})</td>
+                        <td>{{ appt.date_time }}</td>
+                        <td>{{ appt.status }}</td>
+                        <td>{{ appt.treatment.diagnosis if appt.treatment else '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
