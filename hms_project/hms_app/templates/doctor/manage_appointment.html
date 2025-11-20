@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Manage Appointment #{{ appointment.id }}</h2>
+    <p><strong>Patient:</strong> {{ appointment.patient.user.username }}</p>
+    <p><strong>Date:</strong> {{ appointment.date_time }}</p>
+    <p><strong>Symptoms:</strong> {{ appointment.symptoms }}</p>
+
+    <form method="POST" action="">
+        <div class="mb-3">
+            <label class="form-label">Status</label>
+            <select name="status" class="form-control">
+                <option value="Booked" {% if appointment.status == 'Booked' %}selected{% endif %}>Booked</option>
+                <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+        </div>
+
+        <h4>Treatment</h4>
+        <div class="mb-3">
+            <label class="form-label">Diagnosis</label>
+            <textarea name="diagnosis" class="form-control">{{ appointment.treatment.diagnosis if appointment.treatment else '' }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Prescription</label>
+            <textarea name="prescription" class="form-control">{{ appointment.treatment.prescription if appointment.treatment else '' }}</textarea>
+        </div>
+         <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-control">{{ appointment.treatment.description if appointment.treatment else '' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+{% endblock %}
