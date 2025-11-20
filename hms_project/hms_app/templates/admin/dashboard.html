@@ -64,9 +64,9 @@
         </div>
         <div class="col-md-6">
              <h3>Doctors List</h3>
-             <form action="{{ url_for('admin.search_doctor') }}" method="POST" class="mb-3">
+             <form action="{{ url_for('admin.search') }}" method="POST" class="mb-3">
                  <div class="input-group">
-                     <input type="text" name="query" class="form-control" placeholder="Search by name or specialization">
+                     <input type="text" name="doctor_query" class="form-control" placeholder="Search doctor name/spec">
                      <button class="btn btn-outline-secondary" type="submit">Search</button>
                  </div>
              </form>
@@ -75,9 +75,14 @@
                 <li class="list-group-item">
                     <div class="d-flex justify-content-between align-items-center">
                         {{ doctor.user.username }} ({{ doctor.department.name }})
-                        <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#editDoctor{{ doctor.id }}">
-                            Edit
-                        </button>
+                        <div>
+                            <button class="btn btn-sm btn-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#editDoctor{{ doctor.id }}">
+                                Edit
+                            </button>
+                             <form action="{{ url_for('admin.delete_user', user_id=doctor.user_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                                 <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+                            </form>
+                        </div>
                     </div>
                     <div class="collapse mt-2" id="editDoctor{{ doctor.id }}">
                         <form action="{{ url_for('admin.update_doctor', doctor_id=doctor.id) }}" method="POST">
@@ -92,6 +97,30 @@
              </ul>
         </div>
     </div>
+    <div class="row mt-4">
+        <div class="col-12">
+             <h3>Patients List</h3>
+             <form action="{{ url_for('admin.search') }}" method="POST" class="mb-3">
+                 <div class="input-group">
+                     <input type="text" name="patient_query" class="form-control" placeholder="Search patient name/contact">
+                     <button class="btn btn-outline-secondary" type="submit">Search</button>
+                 </div>
+             </form>
+             <ul class="list-group mb-4">
+                {% for patient in patients %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        {{ patient.user.username }} ({{ patient.contact_info }})
+                         <form action="{{ url_for('admin.delete_user', user_id=patient.user_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure?');">
+                             <button class="btn btn-sm btn-danger" type="submit">Remove</button>
+                        </form>
+                    </div>
+                </li>
+                {% endfor %}
+             </ul>
+        </div>
+    </div>
+
     <div class="row mt-4">
         <div class="col-12">
             <h3>All Appointments</h3>
